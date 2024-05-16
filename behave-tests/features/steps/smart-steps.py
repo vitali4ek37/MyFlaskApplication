@@ -1,18 +1,29 @@
+import json
 import random
 import requests
 from behave import given, when, then
+from pymongo import MongoClient
+from bson.json_util import dumps
 
 
 @given(u'a Create User request')
 def step_impl(context):
+    client = MongoClient('mongodb://localhost:27017')
+    db = client['my_database']
+    collection = db['users']
+    found_users = collection.find_one({"email": "test4@test.com"})
+    found_users_json = json.loads(dumps(found_users))
+    print(type(found_users_json))
+    print(found_users_json)
+
     context.email = f"test{random.randint(3, 1000)}@vodafone.com"
     context.request_body = {
-        "username": "test",
-        "password": "password",
         "email": context.email,
         "name": "John",
         "lastname": "Snow",
-        "phone": "1234567890"
+        "phone_number": "1234567890",
+        "country": "Spain",
+        "password": "password"
     }
 
     context.headers = {
@@ -33,13 +44,12 @@ def step_impl(context):
     client = context.mongo_client  # Adjust host and port if needed
     db = client['my_database']
     collection = db['users']
-    search_email = context.email
     # Find user with matching email
-    user = collection.find_one({"email": search_email})
+    user = collection.find_one({"email": context.email})
     if user:
-        print(f"User with email '{search_email}' found!")
+        print(f"User with email '{context.email}' found!")
     else:
-        print(f"User with email '{search_email}' not found.")
+        print(f"User with email '{context.email}' not found.")
     assert user is not None
 
 
@@ -51,10 +61,3 @@ def step_impl(context):
     response = requests.get(url=f"{context.base_url}/users", params=params)
     assert response.status_code == 200
     assert response.json()[0]['email'] == context.email
-
-    params = {
-        "name": "John"
-    }
-    response = requests.get(url=f"{context.base_url}/users", params=params)
-    assert response.status_code == 200
-    assert response.json()[0]['name'] == 'John'

@@ -2,7 +2,8 @@ version: '3.8'
 
 services:
   app:
-    build: .
+    build: ./back
+    container_name: app
     ports:
       - "5000:5000"
     depends_on:
@@ -10,5 +11,13 @@ services:
 
   mongo:
     image: mongo:latest
+    container_name: mongo
     ports:
       - "27017:27017"
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./ui:/usr/share/nginx/html
+    ports:
+      - "80:80"
