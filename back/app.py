@@ -50,22 +50,27 @@ def get_users():
         user_ready = None
         if user is not None:
             user_ready = {key: user[key] for key in user if key in allowed_fields}
-        return user_ready
+            return user_ready
+        else:
+            return "You should specify a valid search criteria", 400
     elif "email" in request.args:
         email = request.args.get("email")
         user = collection.find_one({"email": email})
         user_ready = None
         if user is not None:
             user_ready = {key: user[key] for key in user if key in allowed_fields}
-        print(user_ready)
-        return user_ready
+            return user_ready
+        else:
+            return "You should specify a valid search criteria", 400
     elif "name" in request.args:
         name = request.args.get("name")
         user = collection.find_one({"name": name})
         user_ready = None
         if user is not None:
             user_ready = {key: user[key] for key in user if key in allowed_fields}
-        return user_ready
+            return user_ready
+        else:
+            return "You should specify a valid search criteria", 400
     else:
         return "You should specify at least one query parameter", 400
 

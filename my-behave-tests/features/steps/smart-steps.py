@@ -8,14 +8,6 @@ from bson.json_util import dumps
 
 @given(u'a Create User request')
 def step_impl(context):
-    client = MongoClient('mongodb://localhost:27017')
-    db = client['my_database']
-    collection = db['users']
-    found_users = collection.find_one({"email": "test4@test.com"})
-    found_users_json = json.loads(dumps(found_users))
-    print(type(found_users_json))
-    print(found_users_json)
-
     context.email = f"test{random.randint(3, 1000)}@vodafone.com"
     context.request_body = {
         "email": context.email,
@@ -56,8 +48,8 @@ def step_impl(context):
 @then(u'can be obtained by API')
 def step_impl(context):
     params = {
-        "emails": context.email
+        "email": context.email
     }
     response = requests.get(url=f"{context.base_url}/users", params=params)
     assert response.status_code == 200
-    assert response.json()[0]['email'] == context.email
+    assert response.json()['email'] == context.email
